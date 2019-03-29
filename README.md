@@ -1,6 +1,6 @@
-# sample-spring-of-toby
+# description
 ----
-understand in sample code
+understand in manual code on Spring 3.1
 
 # ref
 ---
