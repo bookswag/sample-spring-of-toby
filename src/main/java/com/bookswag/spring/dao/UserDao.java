@@ -1,19 +1,20 @@
 package com.bookswag.spring.dao;
 
-import com.bookswag.spring.database.SimpleConnectionMaker;
+import com.bookswag.spring.database.ConnectionMaker;
+import com.bookswag.spring.database.NConnectionMaker;
 import com.bookswag.spring.domain.User;
 
 import java.sql.*;
 
 public class UserDao {
-    private SimpleConnectionMaker simpleConnectionMaker;
+    private ConnectionMaker connectionMaker;
 
-    public UserDao(SimpleConnectionMaker simpleConnectionMaker) {
-        this.simpleConnectionMaker = simpleConnectionMaker; 
+    public UserDao() {
+        this.connectionMaker = new NConnectionMaker(); // WTH
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        Connection c = connectionMaker.makeConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "insert into users(id, name, password) values(?,?,?)");
@@ -28,7 +29,7 @@ public class UserDao {
     }
 
     public User get(String id)  throws ClassNotFoundException, SQLException {
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        Connection c = connectionMaker.makeConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "select * from users where id = ?");
