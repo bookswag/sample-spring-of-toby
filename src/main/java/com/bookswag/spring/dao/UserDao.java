@@ -4,10 +4,7 @@ import com.bookswag.spring.domain.User;
 
 import java.sql.*;
 
-public class UserDao {
-    private static final String JDBC_URL = "jdbc:mysql://localhost/toby";
-    private static final String LOCAL_USER = "user01";
-    private static final String LOCAL_PASSWORD = "1234";
+public abstract class UserDao {
 
     public void add(User user) throws ClassNotFoundException, SQLException {
         Connection c = getConnection();
@@ -45,9 +42,5 @@ public class UserDao {
         return user;
     }
 
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection( JDBC_URL, LOCAL_USER, LOCAL_PASSWORD );
-        return c;
-    }
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 }

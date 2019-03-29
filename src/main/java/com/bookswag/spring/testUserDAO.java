@@ -1,5 +1,6 @@
 package com.bookswag.spring;
 
+import com.bookswag.spring.dao.NUserDao;
 import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.domain.User;
 
@@ -16,7 +17,7 @@ public class testUserDAO {
      * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        UserDao dao = new UserDao();
+        UserDao dao = new NUserDao();
 
         User newUser = new User();
         newUser.setId("spring");
