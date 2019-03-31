@@ -5,8 +5,14 @@ import com.bookswag.spring.database.NConnectionMaker;
 
 public class DaoFactory {
     public UserDao getUserDao() {
-        ConnectionMaker connectionMaker = new NConnectionMaker();
-        UserDao userDao = new UserDao(connectionMaker);
-        return userDao;
+        return new UserDao(new NConnectionMaker());
+    }
+
+    public AccountDao getAccountDao() {
+        return new AccountDao(new NConnectionMaker());
+    }
+
+    public MessageDao getMessageDao() {
+        return new MessageDao(new NConnectionMaker());
     }
 }
