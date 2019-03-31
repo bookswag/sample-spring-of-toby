@@ -9,23 +9,30 @@ import org.springframework.context.annotation.Configuration;
 public class DaoFactory {
 
     @Bean
-    @Deprecated
     public UserDao userDao() {
-        return new UserDao();
+        return new UserDao(connectionMaker());
     }
 
     @Bean
-    @Deprecated
     public AccountDao accountDao() {
-        return new AccountDao();
+        return new AccountDao(connectionMaker());
     }
 
     @Bean
-    @Deprecated
     public MessageDao messageDao() {
-        return new MessageDao();
+        return new MessageDao(connectionMaker());
     }
 
+    /**
+     *
+     * It can do it toby said
+     * in develop
+     *  return new LocalDBConnectionMaker();
+     * in production
+     *  return ProductionDBConnectionMaker();
+     *  but it's tough to change that code whenever deploy.
+     * @return
+     */
     @Bean
     public ConnectionMaker connectionMaker() {
         return new NConnectionMaker();
