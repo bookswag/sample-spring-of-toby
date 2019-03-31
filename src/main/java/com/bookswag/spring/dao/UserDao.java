@@ -1,7 +1,6 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.database.ConnectionMaker;
-import com.bookswag.spring.database.NConnectionMaker;
 import com.bookswag.spring.domain.User;
 
 import java.sql.*;
@@ -9,8 +8,8 @@ import java.sql.*;
 public class UserDao {
     private ConnectionMaker connectionMaker;
 
-    public UserDao() {
-        this.connectionMaker = new NConnectionMaker(); // WTH
+    public UserDao(ConnectionMaker connectionMaker) {
+        this.connectionMaker = connectionMaker;
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
