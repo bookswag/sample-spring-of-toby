@@ -7,9 +7,17 @@ import java.sql.*;
 
 public class UserDao {
     private ConnectionMaker connectionMaker;
+    private static UserDao INSTANCE;
 
-    public UserDao(ConnectionMaker connectionMaker) {
+    private UserDao(ConnectionMaker connectionMaker) {
         this.connectionMaker = connectionMaker;
+    }
+
+    public static synchronized UserDao getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new UserDao(???);
+            return INSTANCE;
+        }
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
