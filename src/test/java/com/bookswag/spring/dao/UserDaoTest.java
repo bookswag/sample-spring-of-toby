@@ -3,6 +3,8 @@ package com.bookswag.spring.dao;
 import com.bookswag.spring.database.ConnectionMaker;
 import com.bookswag.spring.database.NConnectionMaker;
 import com.bookswag.spring.domain.User;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
 
@@ -18,8 +20,8 @@ import java.sql.SQLException;
  */
 public class UserDaoTest {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        // UserDaoTest only focus on test without setting relation ship
-        UserDao dao = new DaoFactory().getUserDao();
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao dao = context.getBean("userDao", UserDao.class);
 
         User newUser = new User();
         newUser.setId("spring");
