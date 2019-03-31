@@ -18,9 +18,8 @@ import java.sql.SQLException;
  */
 public class UserDaoTest {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        ConnectionMaker connectionMaker = new NConnectionMaker();
-
-        UserDao dao = new UserDao(connectionMaker);
+        // UserDaoTest only focus on test without setting relation ship
+        UserDao dao = new DaoFactory().getUserDao();
 
         User newUser = new User();
         newUser.setId("spring");
