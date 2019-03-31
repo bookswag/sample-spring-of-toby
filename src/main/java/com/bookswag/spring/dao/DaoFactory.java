@@ -9,21 +9,25 @@ import org.springframework.context.annotation.Configuration;
 public class DaoFactory {
 
     @Bean
+    @Deprecated
     public UserDao userDao() {
-        return new UserDao(getConnectionMaker());
+        return new UserDao();
     }
 
     @Bean
+    @Deprecated
     public AccountDao accountDao() {
-        return new AccountDao(getConnectionMaker());
+        return new AccountDao();
     }
 
     @Bean
+    @Deprecated
     public MessageDao messageDao() {
-        return new MessageDao(getConnectionMaker());
+        return new MessageDao();
     }
 
-    private ConnectionMaker getConnectionMaker() {
+    @Bean
+    public ConnectionMaker connectionMaker() {
         return new NConnectionMaker();
     }
 }

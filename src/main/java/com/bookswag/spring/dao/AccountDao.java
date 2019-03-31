@@ -8,7 +8,8 @@ import com.bookswag.spring.database.ConnectionMaker;
 public class AccountDao {
     private ConnectionMaker connectionMaker;
 
-    public AccountDao(ConnectionMaker connectionMaker) {
-        this.connectionMaker = connectionMaker;
+    public AccountDao() {
+        DaoFactory daoFactory = new DaoFactory();
+        this.connectionMaker = daoFactory.connectionMaker();
     }
 }
