@@ -13,6 +13,14 @@ public class DaoFactory {
         return new UserDao(connectionMaker());
     }
 
+//    DI through method
+//    @Bean
+//    public UserDao userDao() {
+//        UserDao userDao = new UserDao();
+//        userDao.setConnectionMaker(connectionMaker());
+//        return return userDao;
+//    }
+
     @Bean
     public AccountDao accountDao() {
         return new AccountDao(connectionMaker());
