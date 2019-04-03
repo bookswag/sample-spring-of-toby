@@ -26,6 +26,7 @@ dependencies {
     compile 'org.slf4j:jcl-over-slf4j:' + jclOverSlf4jVersion
     compile 'ch.qos.logback:logback-classic:' + logbackVersion
     compile 'org.springframework:spring-webmvc:' +springVersion
+    compile group: 'org.springframework', name: 'spring-jdbc', version:'4.1.6.RELEASE'
     compile 'javax.servlet:jstl:' + jstlVersion
     compile 'org.springframework:spring-test:' + springVersion
     //exclude the build in hamcrest

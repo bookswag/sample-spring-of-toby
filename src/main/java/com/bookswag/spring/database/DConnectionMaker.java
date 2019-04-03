@@ -3,6 +3,7 @@ package com.bookswag.spring.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+@Deprecated
 public class DConnectionMaker implements ConnectionMaker {
     @Override
     public Connection makeConnection() throws ClassNotFoundException, SQLException {
