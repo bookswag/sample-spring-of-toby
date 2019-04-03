@@ -1,14 +1,14 @@
 package com.bookswag.spring.dao;
 
-import com.bookswag.spring.database.ConnectionMaker;
-import com.bookswag.spring.database.NConnectionMaker;
 import com.bookswag.spring.domain.User;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.sql.SQLException;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * progress of workflow on JDBC
@@ -20,7 +20,8 @@ import java.sql.SQLException;
  * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
  */
 public class UserDaoTest {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    @Test
+    public void addAndGet() throws ClassNotFoundException, SQLException {
         ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         UserDao dao = context.getBean("userDao", UserDao.class);
 
@@ -31,17 +32,9 @@ public class UserDaoTest {
 
         dao.add(newUser);
 
-        System.out.println(newUser.getId() + " is registered.");
-
-
         User dbUser = dao.get(newUser.getId());
 
-        if (!newUser.getName().equals(dbUser.getName())) {
-            System.out.println("Test fail (name)");
-        } else if (!newUser.getPassword().equals(dbUser.getPassword())) {
-            System.out.println("Test fail (password");
-        } else {
-            System.out.println("Test success");
-        }
+        assertThat(dbUser.getName(), is(newUser.getName()));
+        assertThat(dbUser.getPassword(), is(newUser.getPassword()));
     }
 }
