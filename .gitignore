@@ -22,6 +22,7 @@
 # Gradle & Etc  Project Files
 .gradle
 .idea
+out/
 gradle/
 gradlew
 gradlew.bat
