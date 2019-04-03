@@ -3,6 +3,7 @@ package com.bookswag.spring.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+@Deprecated
 public class CountingConnectionMaker implements ConnectionMaker {
     int count = 0;
     private ConnectionMaker actualConnectionMaker;

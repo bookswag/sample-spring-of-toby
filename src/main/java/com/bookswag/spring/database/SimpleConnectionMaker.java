@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Deprecated
 @UtilityClass
 public class SimpleConnectionMaker {
     private static final String JDBC_URL = "jdbc:mysql://localhost/toby";

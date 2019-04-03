@@ -1,5 +1,7 @@
-package com.bookswag.spring.dao;
+package com.bookswag.spring;
 
+import com.bookswag.spring.dao.DaoFactory;
+import com.bookswag.spring.dao.UserDao;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

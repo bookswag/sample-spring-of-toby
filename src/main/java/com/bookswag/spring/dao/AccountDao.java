@@ -5,6 +5,7 @@ import com.bookswag.spring.database.ConnectionMaker;
 /**
  * Dummy class for big DaoFactory
  */
+@Deprecated
 public class AccountDao {
     private ConnectionMaker connectionMaker;
 
