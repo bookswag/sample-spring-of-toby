@@ -33,7 +33,15 @@ public class UserDaoTest {
 
         System.out.println(newUser.getId() + " is registered.");
 
+
         User dbUser = dao.get(newUser.getId());
-        System.out.println(dbUser.getName());
+
+        if (!newUser.getName().equals(dbUser.getName())) {
+            System.out.println("Test fail (name)");
+        } else if (!newUser.getPassword().equals(dbUser.getPassword())) {
+            System.out.println("Test fail (password");
+        } else {
+            System.out.println("Test success");
+        }
     }
 }
