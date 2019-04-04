@@ -1,6 +1,8 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.domain.User;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -21,10 +23,19 @@ import static org.junit.Assert.assertThat;
  * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
  */
 public class UserDaoTest {
+
+    private UserDao dao;
+
+    @Before // Generate context for 3 times
+    public void setUp() throws SQLException {
+        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+        dao = context.getBean("userDao", UserDao.class);
+        dao.deleteAll();
+        assertThat(dao.getCount(), is(0));
+    }
+
     @Test
     public void addAndGet() throws SQLException {
-        UserDao dao = getEmptyUserDaoFromApplicationContext();
-
         User user1 = new User("spring", "bookswag", "1234");
         User user2 = new User("spring2", "book_swag", "1234");
 
@@ -43,15 +54,11 @@ public class UserDaoTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void emptyGet() throws SQLException {
-        UserDao dao = getEmptyUserDaoFromApplicationContext();
-
         dao.get("unknown_id");
     }
 
     @Test
     public void count() throws SQLException {
-        UserDao dao = getEmptyUserDaoFromApplicationContext();
-
         User user1 = new User("id1", "user1", "1234");
         dao.add(user1);
         assertThat(dao.getCount(), is(1));
@@ -65,11 +72,4 @@ public class UserDaoTest {
         assertThat(dao.getCount(), is(3));
     }
 
-    private UserDao getEmptyUserDaoFromApplicationContext() throws SQLException {
-        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao", UserDao.class);
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
-        return dao;
-    }
 }
