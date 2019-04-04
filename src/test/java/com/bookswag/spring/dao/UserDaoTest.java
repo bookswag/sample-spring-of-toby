@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,19 +29,14 @@ import static org.junit.Assert.assertThat;
 @ContextConfiguration(locations="/applicationContext.xml")
 public class UserDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoTest.class);
-    @Autowired
-    private ApplicationContext context;
 
+    @Autowired
     private UserDao dao;
 
     @Before
     public void setUp() throws SQLException {
-        dao = context.getBean("userDao", UserDao.class);
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
-
-        LOGGER.info("this.context : {}",this.context);
-        LOGGER.info("this : {}", this);
     }
 
     @Test
