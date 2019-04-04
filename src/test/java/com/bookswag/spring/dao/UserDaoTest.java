@@ -4,6 +4,7 @@ import com.bookswag.spring.domain.User;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.SQLException;
 
@@ -22,33 +23,34 @@ import static org.junit.Assert.assertThat;
 public class UserDaoTest {
     @Test
     public void addAndGet() throws SQLException {
-        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao", UserDao.class);
+        UserDao dao = getEmptyUserDaoFromApplicationContext();
 
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        User user1 = new User("spring", "bookswag", "1234");
+        User user2 = new User("spring2", "book_swag", "1234");
 
-        User newUser = new User();
-        newUser.setId("spring");
-        newUser.setName("bookswag");
-        newUser.setPassword("1234");
+        dao.add(user1);
+        dao.add(user2);
+        assertThat(dao.getCount(), is(2));
 
-        dao.add(newUser);
-        assertThat(dao.getCount(), is(1));
+        User dbUser1 = dao.get(user1.getId());
+        assertThat(dbUser1.getName(), is(user1.getName()));
+        assertThat(dbUser1.getPassword(), is(user1.getPassword()));
 
-        User dbUser = dao.get(newUser.getId());
+        User dbUser2 = dao.get(user2.getId());
+        assertThat(dbUser2.getName(), is(user2.getName()));
+        assertThat(dbUser2.getPassword(), is(user2.getPassword()));
+    }
 
-        assertThat(dbUser.getName(), is(newUser.getName()));
-        assertThat(dbUser.getPassword(), is(newUser.getPassword()));
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void emptyGet() throws SQLException {
+        UserDao dao = getEmptyUserDaoFromApplicationContext();
+
+        dao.get("unknown_id");
     }
 
     @Test
     public void count() throws SQLException {
-        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao", UserDao.class);
-
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
+        UserDao dao = getEmptyUserDaoFromApplicationContext();
 
         User user1 = new User("id1", "user1", "1234");
         dao.add(user1);
@@ -61,5 +63,13 @@ public class UserDaoTest {
         User user3 = new User("id3", "user3", "1234");
         dao.add(user3);
         assertThat(dao.getCount(), is(3));
+    }
+
+    private UserDao getEmptyUserDaoFromApplicationContext() throws SQLException {
+        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+        UserDao dao = context.getBean("userDao", UserDao.class);
+        dao.deleteAll();
+        assertThat(dao.getCount(), is(0));
+        return dao;
     }
 }
