@@ -1,25 +1,26 @@
 # description
-----
-understand in manual code on Spring 3.1
+understand in manual code on Spring 3.1 (Env is 4.2 for Gradle)
 
-# Ch1. Dependency among Objects
+---
 
-# Ch2. Test on the stuff for that
+## Ch1. Dependency among Objects
 
-# Ch3. Template/Callback pattern
+## Ch2. Test on the stuff for that
 
-# Ch4. Exception
+## Ch3. Template/Callback pattern
 
-# Ch5. Portable Service Architecture
+## Ch4. Exception
 
-# Ch6. AOP
+## Ch5. Portable Service Architecture
 
-# Ch7. Combination of Spring's key feature
+## Ch6. AOP
 
-# Ch8. What's the Spring ?
+## Ch7. Combination of Spring's key feature
 
-# Ch9. Start Spring project
+## Ch8. What's the Spring ?
 
-# ref
+## Ch9. Start Spring project
+
+## ref
 ---
 https://book.naver.com/bookdb/book_detail.nhn?bid=7006514
