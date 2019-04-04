@@ -8,9 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -27,6 +30,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/applicationContext.xml")
+@DirtiesContext // TODO : manual DI for test env. but, it's forceful changing on applicationContext.xml
 public class UserDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoTest.class);
 
@@ -35,6 +39,10 @@ public class UserDaoTest {
 
     @Before
     public void setUp() throws SQLException {
+        DataSource dataSource = new SingleConnectionDataSource(
+            "jdbc:mysql://localhost/toby_test?autoReconnect=true&amp;useSSL=false", "user01", "1234", true);
+        dao.setDataSource(dataSource);
+
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
     }
