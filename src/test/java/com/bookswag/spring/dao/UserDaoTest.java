@@ -21,9 +21,12 @@ import static org.junit.Assert.assertThat;
  */
 public class UserDaoTest {
     @Test
-    public void addAndGet() throws ClassNotFoundException, SQLException {
+    public void addAndGet() throws SQLException {
         ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         UserDao dao = context.getBean("userDao", UserDao.class);
+
+        dao.deleteAll();
+        assertThat(dao.getCount(), is(0));
 
         User newUser = new User();
         newUser.setId("spring");
@@ -31,10 +34,32 @@ public class UserDaoTest {
         newUser.setPassword("1234");
 
         dao.add(newUser);
+        assertThat(dao.getCount(), is(1));
 
         User dbUser = dao.get(newUser.getId());
 
         assertThat(dbUser.getName(), is(newUser.getName()));
         assertThat(dbUser.getPassword(), is(newUser.getPassword()));
+    }
+
+    @Test
+    public void count() throws SQLException {
+        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+        UserDao dao = context.getBean("userDao", UserDao.class);
+
+        dao.deleteAll();
+        assertThat(dao.getCount(), is(0));
+
+        User user1 = new User("id1", "user1", "1234");
+        dao.add(user1);
+        assertThat(dao.getCount(), is(1));
+
+        User user2 = new User("id2", "user2", "1234");
+        dao.add(user2);
+        assertThat(dao.getCount(), is(2));
+
+        User user3 = new User("id3", "user3", "1234");
+        dao.add(user3);
+        assertThat(dao.getCount(), is(3));
     }
 }
