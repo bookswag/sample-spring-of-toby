@@ -4,9 +4,13 @@ import com.bookswag.spring.domain.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.SQLException;
 
@@ -22,13 +26,16 @@ import static org.junit.Assert.assertThat;
  * 5. Must Close all resource such as Connection, Statement, ResultSet at last time
  * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="/applicationContext.xml")
 public class UserDaoTest {
+    @Autowired
+    private ApplicationContext context;
 
     private UserDao dao;
 
-    @Before // Generate context for 3 times
+    @Before
     public void setUp() throws SQLException {
-        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         dao = context.getBean("userDao", UserDao.class);
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
