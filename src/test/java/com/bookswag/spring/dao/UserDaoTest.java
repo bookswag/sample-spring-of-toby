@@ -28,16 +28,19 @@ import static org.junit.Assert.assertThat;
  * 5. Must Close all resource such as Connection, Statement, ResultSet at last time
  * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml") // that context is shared among other test class
 public class UserDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoTest.class);
 
-    @Autowired
+    // Not @Autowired
     private UserDao dao;
 
     @Before
     public void setUp() throws SQLException {
+        dao = new UserDao();
+        DataSource dataSource = new SingleConnectionDataSource( // independent connection, not share
+            "jdbc:mysql://localhost/toby_test?autoReconnect=true&amp;useSSL=false", "user01", "1234", true);
+        dao.setDataSource(dataSource);
+
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
     }
