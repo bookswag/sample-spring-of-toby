@@ -29,8 +29,7 @@ import static org.junit.Assert.assertThat;
  * 6. Handle exception from JDBC API, or Declare 'throws' to method to do throw out of it
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/applicationContext.xml")
-@DirtiesContext // TODO : manual DI for test env. but, it's forceful changing on applicationContext.xml
+@ContextConfiguration(locations="/test-applicationContext.xml") // that context is shared among other test class
 public class UserDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoTest.class);
 
@@ -39,10 +38,6 @@ public class UserDaoTest {
 
     @Before
     public void setUp() throws SQLException {
-        DataSource dataSource = new SingleConnectionDataSource(
-            "jdbc:mysql://localhost/toby_test?autoReconnect=true&amp;useSSL=false", "user01", "1234", true);
-        dao.setDataSource(dataSource);
-
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
     }
