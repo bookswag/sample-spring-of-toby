@@ -1,4 +1,4 @@
-package com.bookswag.spring;
+package com.bookswag.spring.learningtest;
 
 import com.bookswag.spring.dao.UserDao;
 import org.junit.Test;
