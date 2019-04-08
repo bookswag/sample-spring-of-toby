@@ -119,49 +119,37 @@ public class UserDao {
     }
 
     public void add(final User user) throws SQLException {
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement(
-                        "insert into users(id, name, password) values(?,?,?)");
-                ps.setString(1, user.getId());
-                ps.setString(2, user.getName());
-                ps.setString(3, user.getPassword());
+        jdbcContextWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(
+                    "insert into users(id, name, password) values(?,?,?)");
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
 
-                return ps;
-            }
+            return ps;
         });
     }
 
     public User get(final String id) throws SQLException {
-        return getUserJdbcContextWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement(
-                        "select * from users where id = ?");
-                ps.setString(1, id);
-                return ps;
-            }
+        return getUserJdbcContextWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(
+                    "select * from users where id = ?");
+            ps.setString(1, id);
+            return ps;
         });
     }
 
     public void deleteAll() throws SQLException {
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement("delete from users");
-                return ps;
-            }
+        jdbcContextWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement("delete from users");
+            return ps;
         });
     }
 
     public int getCount() throws SQLException {
-        return getCountJdbcContextWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement("select count(*) from users");
-                return ps;
-            }
+        return getCountJdbcContextWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement("select count(*) from users");
+            return ps;
         });
     }
 }
