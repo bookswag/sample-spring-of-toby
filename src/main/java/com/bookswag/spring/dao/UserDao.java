@@ -1,5 +1,6 @@
 package com.bookswag.spring.dao;
 
+import com.bookswag.spring.database.StatementStrategy;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -8,7 +9,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 @NoArgsConstructor
-abstract public class UserDao {
+public class UserDao {
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
@@ -96,7 +97,10 @@ abstract public class UserDao {
 
         try {
             c = dataSource.getConnection();
-            ps = makeStatement(c);
+
+            // Does UserDao.deleteAll have to know UserDeleteAllStatement?
+            StatementStrategy strategy = new UserDeleteAllStatement();
+            ps = strategy.makePreparedStatement(c);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw e;
@@ -113,8 +117,6 @@ abstract public class UserDao {
             }
         }
     }
-
-    abstract protected PreparedStatement makeStatement(Connection c) throws SQLException;
 
     public int getCount() throws SQLException {
         Connection c = null;
