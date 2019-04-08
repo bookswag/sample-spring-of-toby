@@ -16,6 +16,24 @@ public class JdbcContext {
         this.dataSource = dataSource;
     }
 
+    public void executeSql(final String query) throws SQLException {
+        this.workWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(query);
+            return ps;
+        });
+    }
+
+    public void executeAddSql(final String query, final User user) throws SQLException {
+        this.workWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(query);
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
+
+            return ps;
+        });
+    }
+
     public void workWithStatementStrategy (StatementStrategy statementStrategy) throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
@@ -39,6 +57,13 @@ public class JdbcContext {
                 } catch (SQLException e) {}
             }
         }
+    }
+
+    public int executeGetCountSql(final String query) throws SQLException {
+        return this.getCountWorkWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(query);
+            return ps;
+        });
     }
 
     public int getCountWorkWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
@@ -72,6 +97,14 @@ public class JdbcContext {
                 } catch (SQLException e) {}
             }
         }
+    }
+
+    public User executeGetUserSql(final String query, final String param) throws SQLException {
+        return this.getUserWorkWithStatementStrategy((c) -> {
+            PreparedStatement ps = c.prepareStatement(query);
+            ps.setString(1, param);
+            return ps;
+        });
     }
 
     public User getUserWorkWithStatementStrategy (StatementStrategy statementStrategy) throws SQLException {
