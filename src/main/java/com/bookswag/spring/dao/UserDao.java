@@ -1,7 +1,6 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.database.StatementStrategy;
-import com.bookswag.spring.database.UserDeleteAllStatement;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,32 +41,14 @@ public class UserDao {
         }
     }
 
-    public void add(final User user) throws SQLException {
-        StatementStrategy statementStrategy = new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement(
-                        "insert into users(id, name, password) values(?,?,?)");
-                ps.setString(1, user.getId());
-                ps.setString(2, user.getName());
-                ps.setString(3, user.getPassword());
-
-                return ps;
-            }
-        };
-        jdbcContextWithStatementStrategy(statementStrategy);
-    }
-
-    public User get(String id) throws SQLException {
+    public User getUserJdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             c = dataSource.getConnection();
-            ps = c.prepareStatement(
-                    "select * from users where id = ?");
-            ps.setString(1, id);
+            ps = statementStrategy.makePreparedStatement(c);
 
             rs = ps.executeQuery();
 
@@ -104,19 +85,14 @@ public class UserDao {
         }
     }
 
-    public void deleteAll() throws SQLException {
-        StatementStrategy statementStrategy = new UserDeleteAllStatement();
-        jdbcContextWithStatementStrategy(statementStrategy);
-    }
-
-    public int getCount() throws SQLException {
+    public int getCountJdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             c = dataSource.getConnection();
-            ps = c.prepareStatement("select count(*) from users");
+            ps = statementStrategy.makePreparedStatement(c);
 
             rs = ps.executeQuery();
             rs.next();
@@ -140,5 +116,52 @@ public class UserDao {
                 } catch (SQLException e) {}
             }
         }
+    }
+
+    public void add(final User user) throws SQLException {
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                PreparedStatement ps = c.prepareStatement(
+                        "insert into users(id, name, password) values(?,?,?)");
+                ps.setString(1, user.getId());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getPassword());
+
+                return ps;
+            }
+        });
+    }
+
+    public User get(final String id) throws SQLException {
+        return getUserJdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                PreparedStatement ps = c.prepareStatement(
+                        "select * from users where id = ?");
+                ps.setString(1, id);
+                return ps;
+            }
+        });
+    }
+
+    public void deleteAll() throws SQLException {
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                PreparedStatement ps = c.prepareStatement("delete from users");
+                return ps;
+            }
+        });
+    }
+
+    public int getCount() throws SQLException {
+        return getCountJdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                PreparedStatement ps = c.prepareStatement("select count(*) from users");
+                return ps;
+            }
+        });
     }
 }
