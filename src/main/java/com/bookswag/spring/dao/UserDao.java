@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 @NoArgsConstructor
-public class UserDao {
+abstract public class UserDao {
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
@@ -90,7 +90,6 @@ public class UserDao {
         }
     }
 
-    //  Wrong case. TODO : left thing has to be reusable.
     public void deleteAll() throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
@@ -115,11 +114,7 @@ public class UserDao {
         }
     }
 
-    private PreparedStatement makeStatement(Connection c) throws SQLException {
-        PreparedStatement ps;
-        ps = c.prepareStatement("delete from users");
-        return ps;
-    }
+    abstract protected PreparedStatement makeStatement(Connection c) throws SQLException;
 
     public int getCount() throws SQLException {
         Connection c = null;
