@@ -17,14 +17,14 @@ public class JdbcContext {
     }
 
     public void executeSql(final String query) throws SQLException {
-        this.workWithStatementStrategy((c) -> {
+        this.workWithStatementStrategy(c -> {
             PreparedStatement ps = c.prepareStatement(query);
             return ps;
         });
     }
 
     public void executeAddSql(final String query, final User user) throws SQLException {
-        this.workWithStatementStrategy((c) -> {
+        this.workWithStatementStrategy(c -> {
             PreparedStatement ps = c.prepareStatement(query);
             ps.setString(1, user.getId());
             ps.setString(2, user.getName());
@@ -46,21 +46,13 @@ public class JdbcContext {
         } catch (SQLException e) {
             throw e;
         } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {}
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {}
-            }
+            if (ps != null) { try { ps.close(); } catch (SQLException e) {} }
+            if (c != null) { try { c.close(); } catch (SQLException e) {} }
         }
     }
 
     public int executeGetCountSql(final String query) throws SQLException {
-        return this.getCountWorkWithStatementStrategy((c) -> {
+        return this.getCountWorkWithStatementStrategy(c -> {
             PreparedStatement ps = c.prepareStatement(query);
             return ps;
         });
@@ -81,26 +73,14 @@ public class JdbcContext {
         } catch (SQLException e) {
             throw e;
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {}
-            }
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {}
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {}
-            }
+            if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
+            if (ps != null) { try { ps.close(); } catch (SQLException e) {} }
+            if (c != null) { try { c.close(); } catch (SQLException e) {} }
         }
     }
 
     public User executeGetUserSql(final String query, final String param) throws SQLException {
-        return this.getUserWorkWithStatementStrategy((c) -> {
+        return this.getUserWorkWithStatementStrategy(c -> {
             PreparedStatement ps = c.prepareStatement(query);
             ps.setString(1, param);
             return ps;
@@ -133,21 +113,9 @@ public class JdbcContext {
         } catch (SQLException e) {
             throw e;
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {}
-            }
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {}
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {}
-            }
+            if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
+            if (ps != null) { try { ps.close(); } catch (SQLException e) {} }
+            if (c != null) { try { c.close(); } catch (SQLException e) {} }
         }
     }
 }
