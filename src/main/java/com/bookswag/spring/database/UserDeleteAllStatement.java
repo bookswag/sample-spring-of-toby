@@ -1,6 +1,5 @@
-package com.bookswag.spring.dao;
+package com.bookswag.spring.database;
 
-import com.bookswag.spring.database.StatementStrategy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

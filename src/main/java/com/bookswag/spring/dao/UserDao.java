@@ -1,6 +1,7 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.database.StatementStrategy;
+import com.bookswag.spring.database.UserDeleteAllStatement;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,6 +15,31 @@ public class UserDao {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
+        Connection c = null;
+        PreparedStatement ps = null;
+
+        try {
+            c = dataSource.getConnection();
+            ps = statementStrategy.makePreparedStatement(c);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {}
+            }
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {}
+            }
+        }
     }
 
     public void add(User user) throws SQLException {
@@ -92,30 +118,8 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        Connection c = null;
-        PreparedStatement ps = null;
-
-        try {
-            c = dataSource.getConnection();
-
-            // Does UserDao.deleteAll have to know UserDeleteAllStatement?
-            StatementStrategy strategy = new UserDeleteAllStatement();
-            ps = strategy.makePreparedStatement(c);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {}
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {}
-            }
-        }
+        StatementStrategy statementStrategy = new UserDeleteAllStatement();
+        jdbcContextWithStatementStrategy(statementStrategy);
     }
 
     public int getCount() throws SQLException {
