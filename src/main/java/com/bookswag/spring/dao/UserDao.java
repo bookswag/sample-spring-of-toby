@@ -4,14 +4,16 @@ import com.bookswag.spring.database.JdbcContext;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 @NoArgsConstructor
 public class UserDao {
     private JdbcContext jdbcContext;
 
-    public void setJdbcContext(JdbcContext jdbcContext) {
-        this.jdbcContext = jdbcContext;
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcContext = new JdbcContext();
+        this.jdbcContext.setDataSource(dataSource);
     }
 
     public void add(final User user) throws SQLException {
