@@ -1,7 +1,6 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.database.StatementStrategy;
-import com.bookswag.spring.database.UserAddStatement;
 import com.bookswag.spring.database.UserDeleteAllStatement;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
@@ -44,6 +43,25 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
+        // local class
+        class UserAddStatement implements StatementStrategy {
+            User user;
+
+            public UserAddStatement(User user) {
+                this.user = user;
+            }
+
+            @Override
+            public PreparedStatement makePreparedStatement (Connection c) throws SQLException {
+                PreparedStatement ps = c.prepareStatement(
+                        "insert into users(id, name, password) values(?,?,?)");
+                ps.setString(1, user.getId());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getPassword());
+
+                return ps;
+            }
+        }
         StatementStrategy statementStrategy = new UserAddStatement(user);
         jdbcContextWithStatementStrategy(statementStrategy);
     }
