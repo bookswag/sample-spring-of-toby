@@ -90,13 +90,14 @@ public class UserDao {
         }
     }
 
+    //  Wrong case. TODO : left thing has to be reusable.
     public void deleteAll() throws SQLException {
         Connection c = null;
         PreparedStatement ps = null;
 
         try {
             c = dataSource.getConnection();
-            ps = c.prepareStatement("delete from users");
+            ps = makeStatement(c);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw e;
@@ -112,6 +113,12 @@ public class UserDao {
                 } catch (SQLException e) {}
             }
         }
+    }
+
+    private PreparedStatement makeStatement(Connection c) throws SQLException {
+        PreparedStatement ps;
+        ps = c.prepareStatement("delete from users");
+        return ps;
     }
 
     public int getCount() throws SQLException {
