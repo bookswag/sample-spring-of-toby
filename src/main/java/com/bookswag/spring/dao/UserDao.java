@@ -43,10 +43,9 @@ public class UserDao {
     }
 
     public void add(final User user) throws SQLException {
-        // local class
-        class UserAddStatement implements StatementStrategy {
+        StatementStrategy statementStrategy = new StatementStrategy() {
             @Override
-            public PreparedStatement makePreparedStatement (Connection c) throws SQLException {
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 PreparedStatement ps = c.prepareStatement(
                         "insert into users(id, name, password) values(?,?,?)");
                 ps.setString(1, user.getId());
@@ -55,8 +54,7 @@ public class UserDao {
 
                 return ps;
             }
-        }
-        StatementStrategy statementStrategy = new UserAddStatement();
+        };
         jdbcContextWithStatementStrategy(statementStrategy);
     }
 
