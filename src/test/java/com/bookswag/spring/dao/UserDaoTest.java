@@ -37,13 +37,13 @@ public class UserDaoTest {
     private UserDao dao;
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
     }
 
     @Test
-    public void addAndGet() throws SQLException {
+    public void addAndGet() {
         User user1 = new User("spring", "bookswag", "1234");
         User user2 = new User("spring2", "book_swag", "1234");
 
@@ -61,12 +61,12 @@ public class UserDaoTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void emptyGet() throws SQLException {
+    public void emptyGet() {
         dao.get("unknown_id");
     }
 
     @Test
-    public void count() throws SQLException {
+    public void count() {
         User user1 = new User("id1", "user1", "1234");
         dao.add(user1);
         assertThat(dao.getCount(), is(1));
