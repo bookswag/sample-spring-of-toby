@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
+import com.google.common.collect.Lists;
 
 @NoArgsConstructor
 public class UserDao {
@@ -28,6 +30,17 @@ public class UserDao {
                 user.setPassword(rs.getString("password"));
                 return user;
         });
+    }
+
+    public List<User> getAll() {
+        return this.jdbcTemplate.query("select * from users order by id",
+            (ResultSet rs, int rowNum) -> {
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setName(rs.getString("name"));
+                user.setPassword(rs.getString("password"));
+                return user;
+            });
     }
 
     public void deleteAll() {

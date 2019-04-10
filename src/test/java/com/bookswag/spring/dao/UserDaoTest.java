@@ -1,6 +1,7 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.domain.User;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -35,11 +35,17 @@ public class UserDaoTest {
 
     @Autowired
     private UserDao dao;
+    private List<User> members = Lists.newArrayList();
+
 
     @Before
     public void setUp() {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
+
+        members.add(new User("test_user1","user1_name","1234"));
+        members.add(new User("test_user2","user2_name","1234"));
+        members.add(new User("test_user3","user3_name","1234"));
     }
 
     @Test
@@ -52,17 +58,47 @@ public class UserDaoTest {
         assertThat(dao.getCount(), is(2));
 
         User dbUser1 = dao.get(user1.getId());
-        assertThat(dbUser1.getName(), is(user1.getName()));
-        assertThat(dbUser1.getPassword(), is(user1.getPassword()));
+        checkSameUser(user1, dbUser1);
 
         User dbUser2 = dao.get(user2.getId());
-        assertThat(dbUser2.getName(), is(user2.getName()));
-        assertThat(dbUser2.getPassword(), is(user2.getPassword()));
+        checkSameUser(user2, dbUser2);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void emptyGet() {
         dao.get("unknown_id");
+    }
+
+    @Test
+    public void getAll() {
+        dao.deleteAll();
+
+        List<User> dbUsers0 = dao.getAll();
+        assertThat(dbUsers0.size(), is(0));
+
+        dao.add(members.get(0));
+        List<User> dbUsers1 = dao.getAll();
+        assertThat(dbUsers1.size(), is(1));
+        checkSameUser(members.get(0), dbUsers1.get(0));
+
+        dao.add(members.get(1));
+        List<User> dbUsers2 = dao.getAll();
+        assertThat(dbUsers2.size(), is(2));
+        checkSameUser(members.get(0), dbUsers2.get(0));
+        checkSameUser(members.get(1), dbUsers2.get(1));
+
+        dao.add(members.get(2));
+        List<User> dbUsers3 = dao.getAll();
+        assertThat(dbUsers3.size(), is(3));
+        checkSameUser(members.get(0), dbUsers3.get(0));
+        checkSameUser(members.get(1), dbUsers3.get(1));
+        checkSameUser(members.get(2), dbUsers3.get(2));
+    }
+
+    private void checkSameUser(User member,User dbUser) {
+        assertThat(member.getId(), is(dbUser.getId()));
+        assertThat(member.getName(), is(dbUser.getName()));
+        assertThat(member.getPassword(), is(dbUser.getPassword()));
     }
 
     @Test
