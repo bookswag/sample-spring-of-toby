@@ -1,5 +1,6 @@
 package com.bookswag.spring.dao;
 
+import com.bookswag.spring.common.DuplicateUserIdException;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -46,6 +47,12 @@ public class UserDaoTest {
         members.add(new User("test_user1","user1_name","1234"));
         members.add(new User("test_user2","user2_name","1234"));
         members.add(new User("test_user3","user3_name","1234"));
+    }
+
+    @Test(expected = DuplicateUserIdException.class)
+    public void addSameValue() {
+        dao.add(members.get(0));
+        dao.add(members.get(0));
     }
 
     @Test
