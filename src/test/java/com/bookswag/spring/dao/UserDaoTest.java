@@ -1,6 +1,7 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.common.DuplicateUserIdException;
+import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -36,15 +37,14 @@ public class UserDaoTest {
     private UserDao dao;
     private List<User> members = Lists.newArrayList();
 
-
     @Before
     public void setUp() {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
-        members.add(new User("test_user1","user1_name","1234"));
-        members.add(new User("test_user2","user2_name","1234"));
-        members.add(new User("test_user3","user3_name","1234"));
+        members.add(new User("test_user1","user1_name","1234", Level.BASIC, 1, 0));
+        members.add(new User("test_user2","user2_name","1234", Level.SILVER, 55, 10));
+        members.add(new User("test_user3","user3_name","1234", Level.GOLD, 100, 40));
     }
 
     @Test(expected = DuplicateUserIdException.class)
@@ -55,8 +55,8 @@ public class UserDaoTest {
 
     @Test
     public void addAndGet() {
-        User user1 = new User("spring", "bookswag", "1234");
-        User user2 = new User("spring2", "book_swag", "1234");
+        User user1 = new User("spring", "bookswag", "1234", Level.SILVER, 310, 160);
+        User user2 = new User("spring2", "book_swag", "1234", Level.GOLD, 200, 100);
 
         dao.add(user1);
         dao.add(user2);
@@ -104,20 +104,20 @@ public class UserDaoTest {
         assertThat(member.getId(), is(dbUser.getId()));
         assertThat(member.getName(), is(dbUser.getName()));
         assertThat(member.getPassword(), is(dbUser.getPassword()));
+        assertThat(member.getLevel(), is(dbUser.getLevel()));
+        assertThat(member.getLogin(), is(dbUser.getLogin()));
+        assertThat(member.getRecommend(), is(dbUser.getRecommend()));
     }
 
     @Test
     public void count() {
-        User user1 = new User("id1", "user1", "1234");
-        dao.add(user1);
+        dao.add(members.get(0));
         assertThat(dao.getCount(), is(1));
 
-        User user2 = new User("id2", "user2", "1234");
-        dao.add(user2);
+        dao.add(members.get(1));
         assertThat(dao.getCount(), is(2));
 
-        User user3 = new User("id3", "user3", "1234");
-        dao.add(user3);
+        dao.add(members.get(2));
         assertThat(dao.getCount(), is(3));
     }
 

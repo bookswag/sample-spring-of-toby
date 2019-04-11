@@ -2,6 +2,7 @@ package com.bookswag.spring.learningtest;
 
 import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.dao.UserDaoJdbc;
+import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class CommonTest {
     public void sqlExceptionTranslate() {
         userDao.deleteAll();
 
-        User user1 = new User("test_id", "test_name", "1234");
+        User user1 = new User("test_id", "test_name", "1234", Level.BASIC, 1, 0);
         try {
             userDao.add(user1);
             userDao.add(user1);
