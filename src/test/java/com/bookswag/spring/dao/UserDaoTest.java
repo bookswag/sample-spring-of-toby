@@ -109,6 +109,24 @@ public class UserDaoTest {
     }
 
     @Test
+    public void update() {
+        User modifiedUser = memberMap.get("test_user1");
+        User unchangedUser = memberMap.get("test_user2");
+
+        dao.add(modifiedUser);
+        dao.add(unchangedUser);
+
+        modifiedUser.setName("hi");
+        modifiedUser.setLevel(Level.GOLD);
+        dao.update(modifiedUser);
+
+        User modifiedUserAtDB = dao.get(modifiedUser.getId());
+        checkSameUser(modifiedUser, modifiedUserAtDB);
+        User unchangedUserAtDB = dao.get(unchangedUser.getId());
+        checkSameUser(unchangedUser, unchangedUserAtDB);
+    }
+
+    @Test
     public void count() {
         dao.add(memberMap.get("test_user1"));
         assertThat(dao.getCount(), is(1));
