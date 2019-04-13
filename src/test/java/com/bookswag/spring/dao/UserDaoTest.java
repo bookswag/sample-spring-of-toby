@@ -3,7 +3,7 @@ package com.bookswag.spring.dao;
 import com.bookswag.spring.common.DuplicateUserIdException;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -35,22 +36,22 @@ public class UserDaoTest {
 
     @Autowired
     private UserDao dao;
-    private List<User> members = Lists.newArrayList();
+    private Map<String, User> memberMap = Maps.newHashMap();
 
     @Before
     public void setUp() {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
-        members.add(new User("test_user1","user1_name","1234", Level.BASIC, 1, 0));
-        members.add(new User("test_user2","user2_name","1234", Level.SILVER, 55, 10));
-        members.add(new User("test_user3","user3_name","1234", Level.GOLD, 100, 40));
+        memberMap.put("test_user1", new User("test_user1","user1_name","1234", Level.BASIC, 1, 0));
+        memberMap.put("test_user2", new User("test_user2","user2_name","1234", Level.SILVER, 55, 10));
+        memberMap.put("test_user3", new User("test_user3","user3_name","1234", Level.GOLD, 100, 40));
     }
 
     @Test(expected = DuplicateUserIdException.class)
     public void addSameValue() {
-        dao.add(members.get(0));
-        dao.add(members.get(0));
+        dao.add(memberMap.get("test_user1"));
+        dao.add(memberMap.get("test_user1"));
     }
 
     @Test
@@ -76,28 +77,26 @@ public class UserDaoTest {
 
     @Test
     public void getAll() {
-        dao.deleteAll();
-
         List<User> dbUsers0 = dao.getAll();
         assertThat(dbUsers0.size(), is(0));
 
-        dao.add(members.get(0));
+        dao.add(memberMap.get("test_user1"));
         List<User> dbUsers1 = dao.getAll();
         assertThat(dbUsers1.size(), is(1));
-        checkSameUser(members.get(0), dbUsers1.get(0));
+        checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
 
-        dao.add(members.get(1));
+        dao.add(memberMap.get("test_user2"));
         List<User> dbUsers2 = dao.getAll();
         assertThat(dbUsers2.size(), is(2));
-        checkSameUser(members.get(0), dbUsers2.get(0));
-        checkSameUser(members.get(1), dbUsers2.get(1));
+        checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
+        checkSameUser(memberMap.get("test_user2"), dbUsers2.get(1));
 
-        dao.add(members.get(2));
+        dao.add(memberMap.get("test_user3"));
         List<User> dbUsers3 = dao.getAll();
         assertThat(dbUsers3.size(), is(3));
-        checkSameUser(members.get(0), dbUsers3.get(0));
-        checkSameUser(members.get(1), dbUsers3.get(1));
-        checkSameUser(members.get(2), dbUsers3.get(2));
+        checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
+        checkSameUser(memberMap.get("test_user2"), dbUsers2.get(1));
+        checkSameUser(memberMap.get("test_user3"), dbUsers3.get(2));
     }
 
     private void checkSameUser(User member,User dbUser) {
@@ -111,13 +110,13 @@ public class UserDaoTest {
 
     @Test
     public void count() {
-        dao.add(members.get(0));
+        dao.add(memberMap.get("test_user1"));
         assertThat(dao.getCount(), is(1));
 
-        dao.add(members.get(1));
+        dao.add(memberMap.get("test_user2"));
         assertThat(dao.getCount(), is(2));
 
-        dao.add(members.get(2));
+        dao.add(memberMap.get("test_user3"));
         assertThat(dao.getCount(), is(3));
     }
 
