@@ -35,6 +35,8 @@ public class UserServiceTest {
             new User("test_4", "테스터4", "1234", Level.SILVER, 60, 30),
             new User("test_5", "테스터5", "1234", Level.GOLD, 100, 100)
         );
+
+        userDao.deleteAll();
     }
 
     @Test
@@ -44,7 +46,6 @@ public class UserServiceTest {
 
     @Test
     public void upgradeUsersLevel() {
-        userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
@@ -56,6 +57,22 @@ public class UserServiceTest {
         checkLevel(users.get(2), Level.SILVER);
         checkLevel(users.get(3), Level.GOLD);
         checkLevel(users.get(4), Level.GOLD);
+    }
+
+    @Test
+    public void add() {
+        User userWithLevel = users.get(4);
+        User userWithoutLevel = users.get(0);
+        userWithoutLevel.setLevel(null);
+
+        userSerivce.add(userWithLevel);
+        userSerivce.add(userWithoutLevel);
+
+        User userWithLevelOnDB = userDao.get(userWithLevel.getId());
+        User userWithoutLevelOnDB = userDao.get(userWithoutLevel.getId());
+
+        assertThat(userWithLevelOnDB.getLevel(), is(userWithLevel.getLevel()));
+        assertThat(userWithoutLevelOnDB.getLevel(), is(userWithoutLevel.getLevel()));
     }
 
     private void checkLevel(User user, Level expectedLevel) {
