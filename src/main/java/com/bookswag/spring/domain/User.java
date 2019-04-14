@@ -15,4 +15,14 @@ public class User {
     private Level level;
     private int login;
     private int recommend;
+
+    public void upgradeLevel() {
+        Level nextLevel = this.level.nextLevel();
+        if (nextLevel == null) {
+            throw new IllegalStateException(this.level + "can't upgrade");
+        }
+        else {
+            this.level = nextLevel;
+        }
+    }
 }
