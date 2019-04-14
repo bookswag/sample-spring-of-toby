@@ -17,6 +17,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import static com.bookswag.spring.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
+import static com.bookswag.spring.service.UserService.MIN_RECOMMEND_FOR_GOLD;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test/test-applicationContext.xml")
 public class UserServiceTest {
@@ -29,11 +32,11 @@ public class UserServiceTest {
     @Before
     public void setUp() {
         users = Lists.newArrayList(
-            new User("test_1", "테스터1", "1234", Level.BASIC, 49, 0),
-            new User("test_2", "테스터2", "1234", Level.BASIC, 50, 0),
-            new User("test_3", "테스터3", "1234", Level.SILVER, 60, 29),
-            new User("test_4", "테스터4", "1234", Level.SILVER, 60, 30),
-            new User("test_5", "테스터5", "1234", Level.GOLD, 100, 100)
+            new User("test_1", "테스터1", "1234", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
+            new User("test_2", "테스터2", "1234", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
+            new User("test_3", "테스터3", "1234", Level.SILVER, MIN_LOGCOUNT_FOR_SILVER+10, MIN_RECOMMEND_FOR_GOLD-1),
+            new User("test_4", "테스터4", "1234", Level.SILVER, MIN_LOGCOUNT_FOR_SILVER+10, MIN_RECOMMEND_FOR_GOLD),
+            new User("test_5", "테스터5", "1234", Level.GOLD, MIN_LOGCOUNT_FOR_SILVER+50, MIN_RECOMMEND_FOR_GOLD+50)
         );
 
         userDao.deleteAll();
