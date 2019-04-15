@@ -31,6 +31,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.2'
 
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     compile group: 'com.google.guava', name:'guava', version: '14.0'
     compile 'org.springframework:spring-webmvc:' +springVersion
     compile group: 'org.springframework', name: 'spring-jdbc', version:'4.1.6.RELEASE'

@@ -35,7 +35,7 @@ public class UserService {
         }
     }
 
-    private void upgradeLevel(User user) {
+    void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
     }
