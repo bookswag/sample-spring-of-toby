@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +29,8 @@ public class UserServiceTest {
     private UserService userSerivce;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private DataSource dataSource;
     private List<User> users;
 
     @Before
@@ -49,7 +52,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeUsersLevel() {
+    public void upgradeUsersLevel() throws Exception{
         for (User user : users) {
             userDao.add(user);
         }
@@ -64,9 +67,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() {
+    public void upgradeAllOrNothing() throws Exception {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
+        testUserService.setDataSource(this.dataSource);
         userDao.deleteAll();
         for(User user : users) {
             userDao.add(user);
