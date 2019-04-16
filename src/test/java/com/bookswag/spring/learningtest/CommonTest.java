@@ -1,5 +1,6 @@
 package com.bookswag.spring.learningtest;
 
+import com.bookswag.spring.common.DuplicateUserIdException;
 import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.dao.UserDaoJdbc;
 import com.bookswag.spring.domain.Level;
@@ -19,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.hamcrest.core.Is.is;
@@ -51,14 +53,16 @@ public class CommonTest {
         assertThat(secondDao, is(firstDao));
     }
 
-    @Test
-    public void sqlExceptionTranslate() {
-        userDao.deleteAll();
+    @Test (expected = DuplicateUserIdException.class)
+    public void sqlExceptionTranslate() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        userDao.deleteAll(c);
 
         User user1 = new User("test_id", "test_name", "1234", Level.BASIC, 1, 0);
         try {
-            userDao.add(user1);
-            userDao.add(user1);
+            userDao.add(c, user1);
+            userDao.add(c, user1);
         } catch(DuplicateKeyException e) {
             SQLException sqlException = (SQLException) e.getCause();
             SQLExceptionTranslator set = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);

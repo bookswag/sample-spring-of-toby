@@ -1,6 +1,7 @@
 package com.bookswag.spring.dao;
 
 import com.bookswag.spring.common.DuplicateUserIdException;
+import com.bookswag.spring.database.JdbcContext;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDaoJdbc implements UserDao {
     private JdbcTemplate jdbcTemplate;
+    private JdbcContext jdbcContext;
 
     // RowMapper callback object is stateless
     private static RowMapper<User> userRowMapper = (ResultSet rs, int rowNum) -> {
@@ -30,10 +32,12 @@ public class UserDaoJdbc implements UserDao {
 
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.jdbcContext = new JdbcContext();
+        this.jdbcContext.setDataSource(dataSource);
     }
 
     @Override
-    public void add(final User user) throws DuplicateKeyException {
+    public void add(Connection c, final User user) throws DuplicateKeyException {
         try {
             this.jdbcTemplate.update(
                 "insert into users(id, name, password, level, login, recommend) values(?,?,?,?,?,?)",
@@ -44,29 +48,32 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public User get(final String id) {
+    public User get(Connection c, final String id) {
         return this.jdbcTemplate.queryForObject("select * from users where id = ?", new Object[]{id}, userRowMapper);
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll(Connection c) {
         return this.jdbcTemplate.query("select * from users order by id", userRowMapper);
     }
 
     @Override
-    public void update(User user) {
-        this.jdbcTemplate.update(
-            "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ? ",
-            user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getId());
+    public void update(Connection c, User user) throws SQLException {
+        this.jdbcContext.setConnection(c);
+        this.jdbcContext.executeSql("update users set name = '"+user.getName()+"', password = '"+user.getPassword()+"', level = "+user.getLevel().intValue()+", " +
+                "login = "+user.getLogin()+", recommend = "+user.getRecommend()+" where id = '"+user.getId()+"' ");
+//        this.jdbcTemplate.update(
+//            "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ? ",
+//            user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getId());
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAll(Connection c) {
         this.jdbcTemplate.update("delete from users");
     }
 
     @Override
-    public int getCount() {
+    public int getCount(Connection c) {
         return this.jdbcTemplate.queryForInt("select count(*) from users");
     }
 }

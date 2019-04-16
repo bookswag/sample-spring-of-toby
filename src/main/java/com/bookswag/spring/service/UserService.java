@@ -6,6 +6,8 @@ import com.bookswag.spring.domain.User;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 @Setter
@@ -15,11 +17,11 @@ public class UserService {
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     private UserDao userDao;
 
-    public void upgradeLevels() {
-        List<User> users = userDao.getAll();
+    public void upgradeLevels(Connection c) throws SQLException {
+        List<User> users = userDao.getAll(c);
         for(User user : users) {
             if (canUpgradeLevel(user)) {
-                upgradeLevel(user);
+                upgradeLevel(c, user);
             }
         }
     }
@@ -35,15 +37,15 @@ public class UserService {
         }
     }
 
-    void upgradeLevel(User user) {
+    void upgradeLevel(Connection c, User user) throws SQLException {
         user.upgradeLevel();
-        userDao.update(user);
+        userDao.update(c, user);
     }
 
-    public void add(User user) {
+    public void add(Connection c, User user) {
         if (user.getLevel() == null) {
             user.setLevel(Level.BASIC);
         }
-        userDao.add(user);
+        userDao.add(c, user);
     }
 }

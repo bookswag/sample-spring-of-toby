@@ -11,9 +11,14 @@ import java.sql.SQLException;
 
 public class JdbcContext {
     private DataSource dataSource;
+    private Connection connection;
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     public void executeSql(final String query) throws SQLException {
@@ -39,7 +44,7 @@ public class JdbcContext {
         PreparedStatement ps = null;
 
         try {
-            c = dataSource.getConnection();
+            c = this.connection;
             ps = statementStrategy.makePreparedStatement(c);
 
             ps.executeUpdate();

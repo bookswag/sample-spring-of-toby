@@ -14,6 +14,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,63 +39,75 @@ public class UserDaoTest {
 
     @Autowired
     private UserDao dao;
+    @Autowired
+    private DataSource dataSource;
     private Map<String, User> memberMap = Maps.newHashMap();
 
     @Before
-    public void setUp() {
-        dao.deleteAll();
-        assertThat(dao.getCount(), is(0));
-
+    public void setUp() throws SQLException {
         memberMap.put("test_user1", new User("test_user1","user1_name","1234", Level.BASIC, 1, 0));
         memberMap.put("test_user2", new User("test_user2","user2_name","1234", Level.SILVER, 55, 10));
         memberMap.put("test_user3", new User("test_user3","user3_name","1234", Level.GOLD, 100, 40));
     }
 
     @Test(expected = DuplicateUserIdException.class)
-    public void addSameValue() {
-        dao.add(memberMap.get("test_user1"));
-        dao.add(memberMap.get("test_user1"));
+    public void addSameValue() throws SQLException {
+        Connection c = dataSource.getConnection();
+        dao.add(c, memberMap.get("test_user1"));
+        dao.add(c, memberMap.get("test_user1"));
     }
 
     @Test
-    public void addAndGet() {
+    public void addAndGet() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        dao.deleteAll(c);
+        assertThat(dao.getCount(c), is(0));
+
         User user1 = new User("spring", "bookswag", "1234", Level.SILVER, 310, 160);
         User user2 = new User("spring2", "book_swag", "1234", Level.GOLD, 200, 100);
 
-        dao.add(user1);
-        dao.add(user2);
-        assertThat(dao.getCount(), is(2));
+        dao.add(c, user1);
+        dao.add(c, user2);
+        assertThat(dao.getCount(c), is(2));
 
-        User dbUser1 = dao.get(user1.getId());
+        User dbUser1 = dao.get(c, user1.getId());
         checkSameUser(user1, dbUser1);
 
-        User dbUser2 = dao.get(user2.getId());
+        User dbUser2 = dao.get(c, user2.getId());
         checkSameUser(user2, dbUser2);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void emptyGet() {
-        dao.get("unknown_id");
+    public void emptyGet() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        dao.deleteAll(c);
+        assertThat(dao.getCount(c), is(0));
+        dao.get(c,"unknown_id");
     }
 
     @Test
-    public void getAll() {
-        List<User> dbUsers0 = dao.getAll();
+    public void getAll() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        dao.deleteAll(c);
+        List<User> dbUsers0 = dao.getAll(c);
         assertThat(dbUsers0.size(), is(0));
 
-        dao.add(memberMap.get("test_user1"));
-        List<User> dbUsers1 = dao.getAll();
+        dao.add(c, memberMap.get("test_user1"));
+        List<User> dbUsers1 = dao.getAll(c);
         assertThat(dbUsers1.size(), is(1));
         checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
 
-        dao.add(memberMap.get("test_user2"));
-        List<User> dbUsers2 = dao.getAll();
+        dao.add(c, memberMap.get("test_user2"));
+        List<User> dbUsers2 = dao.getAll(c);
         assertThat(dbUsers2.size(), is(2));
         checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
         checkSameUser(memberMap.get("test_user2"), dbUsers2.get(1));
 
-        dao.add(memberMap.get("test_user3"));
-        List<User> dbUsers3 = dao.getAll();
+        dao.add(c, memberMap.get("test_user3"));
+        List<User> dbUsers3 = dao.getAll(c);
         assertThat(dbUsers3.size(), is(3));
         checkSameUser(memberMap.get("test_user1"), dbUsers1.get(0));
         checkSameUser(memberMap.get("test_user2"), dbUsers2.get(1));
@@ -109,33 +124,43 @@ public class UserDaoTest {
     }
 
     @Test
-    public void update() {
+    public void update() throws SQLException {
+        Connection c = dataSource.getConnection();
+
+        dao.deleteAll(c);
+        assertThat(dao.getCount(c), is(0));
+
         User modifiedUser = memberMap.get("test_user1");
         User unchangedUser = memberMap.get("test_user2");
 
-        dao.add(modifiedUser);
-        dao.add(unchangedUser);
+        dao.add(c, modifiedUser);
+        dao.add(c, unchangedUser);
 
         modifiedUser.setName("hi");
         modifiedUser.setLevel(Level.GOLD);
-        dao.update(modifiedUser);
+        dao.update(c, modifiedUser);
 
-        User modifiedUserAtDB = dao.get(modifiedUser.getId());
+        User modifiedUserAtDB = dao.get(c, modifiedUser.getId());
         checkSameUser(modifiedUser, modifiedUserAtDB);
-        User unchangedUserAtDB = dao.get(unchangedUser.getId());
+        User unchangedUserAtDB = dao.get(c, unchangedUser.getId());
         checkSameUser(unchangedUser, unchangedUserAtDB);
     }
 
     @Test
-    public void count() {
-        dao.add(memberMap.get("test_user1"));
-        assertThat(dao.getCount(), is(1));
+    public void count() throws SQLException {
+        Connection c = dataSource.getConnection();
 
-        dao.add(memberMap.get("test_user2"));
-        assertThat(dao.getCount(), is(2));
+        dao.deleteAll(c);
+        assertThat(dao.getCount(c), is(0));
 
-        dao.add(memberMap.get("test_user3"));
-        assertThat(dao.getCount(), is(3));
+        dao.add(c, memberMap.get("test_user1"));
+        assertThat(dao.getCount(c), is(1));
+
+        dao.add(c, memberMap.get("test_user2"));
+        assertThat(dao.getCount(c), is(2));
+
+        dao.add(c, memberMap.get("test_user3"));
+        assertThat(dao.getCount(c), is(3));
     }
 
 }

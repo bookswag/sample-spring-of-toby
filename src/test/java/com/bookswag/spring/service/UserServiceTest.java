@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +32,8 @@ public class UserServiceTest {
     private UserService userSerivce;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private DataSource dataSource;
     private List<User> users;
 
     @Before
@@ -39,8 +45,6 @@ public class UserServiceTest {
             new User("test_4", "테스터4", "1234", Level.SILVER, MIN_LOGCOUNT_FOR_SILVER+10, MIN_RECOMMEND_FOR_GOLD),
             new User("test_5", "테스터5", "1234", Level.GOLD, MIN_LOGCOUNT_FOR_SILVER+50, MIN_RECOMMEND_FOR_GOLD+50)
         );
-
-        userDao.deleteAll();
     }
 
     @Test
@@ -49,39 +53,48 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeUsersLevel() {
+    public void upgradeUsersLevel() throws SQLException {
+        Connection c = dataSource.getConnection();
+        userDao.deleteAll(c);
         for (User user : users) {
-            userDao.add(user);
+            userDao.add(c, user);
         }
 
-        userSerivce.upgradeLevels();
+        userSerivce.upgradeLevels(dataSource.getConnection());
 
-        checkLevelUpgraded(users.get(0), false);
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(2), false);
-        checkLevelUpgraded(users.get(3), true);
-        checkLevelUpgraded(users.get(4), false);
+        checkLevelUpgraded(c, users.get(0), false);
+        checkLevelUpgraded(c, users.get(1), true);
+        checkLevelUpgraded(c, users.get(2), false);
+        checkLevelUpgraded(c, users.get(3), true);
+        checkLevelUpgraded(c, users.get(4), false);
     }
 
     @Test
-    public void upgradeAllOrNothing() {
+    public void upgradeAllOrNothing() throws SQLException{
+        Connection c = dataSource.getConnection();
+        c.setAutoCommit(false);
+
+        userDao.deleteAll(c);
+
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        userDao.deleteAll();
+
         for(User user : users) {
-            userDao.add(user);
+            userDao.add(c, user);
         }
 
         try {
-            testUserService.upgradeLevels();
+            testUserService.upgradeLevels(c);
             fail("Expected TestUserServiceException");
-        } catch (TestUserServiceException e) { }
+        } catch (TestUserServiceException e) {
+            c.rollback();
+        }
 
-        checkLevelUpgraded(users.get(1), false);
+        checkLevelUpgraded(c, users.get(1), false);
     }
 
-    private void checkLevelUpgraded(User user, boolean upgraded) {
-        User updatedUser = userDao.get(user.getId());
+    private void checkLevelUpgraded(Connection c, User user, boolean upgraded) {
+        User updatedUser = userDao.get(c, user.getId());
         if (upgraded) {
             assertThat(updatedUser.getLevel(), is(user.getLevel().nextLevel()));
         } else {
@@ -90,16 +103,19 @@ public class UserServiceTest {
     }
 
     @Test
-    public void add() {
+    public void add() throws SQLException{
+        Connection c = dataSource.getConnection();
+        userDao.deleteAll(c);
+
         User userWithLevel = users.get(4);
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        userSerivce.add(userWithLevel);
-        userSerivce.add(userWithoutLevel);
+        userSerivce.add(c, userWithLevel);
+        userSerivce.add(c, userWithoutLevel);
 
-        User userWithLevelOnDB = userDao.get(userWithLevel.getId());
-        User userWithoutLevelOnDB = userDao.get(userWithoutLevel.getId());
+        User userWithLevelOnDB = userDao.get(c, userWithLevel.getId());
+        User userWithoutLevelOnDB = userDao.get(c, userWithoutLevel.getId());
 
         assertThat(userWithLevelOnDB.getLevel(), is(userWithLevel.getLevel()));
         assertThat(userWithoutLevelOnDB.getLevel(), is(userWithoutLevel.getLevel()));
