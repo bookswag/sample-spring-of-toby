@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -30,7 +30,7 @@ public class UserServiceTest {
     @Autowired
     private UserDao userDao;
     @Autowired
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
     private List<User> users;
 
     @Before
@@ -70,7 +70,7 @@ public class UserServiceTest {
     public void upgradeAllOrNothing() throws Exception {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setDataSource(this.dataSource);
+        testUserService.setTransactionManager(this.transactionManager);
         userDao.deleteAll();
         for(User user : users) {
             userDao.add(user);
