@@ -29,6 +29,8 @@ import static org.junit.Assert.assertThat;
 @ContextConfiguration(locations="/test/test-applicationContext.xml")
 public class CommonTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonTest.class);
+    private static final String TEST_EMAIL = "";
+
 
     @Autowired
     private ApplicationContext context;
@@ -55,7 +57,7 @@ public class CommonTest {
     public void sqlExceptionTranslate() {
         userDao.deleteAll();
 
-        User user1 = new User("test_id", "test_name", "1234", Level.BASIC, 1, 0);
+        User user1 = new User("test_id", "test_name", "1234", TEST_EMAIL, Level.BASIC, 1, 0);
         try {
             userDao.add(user1);
             userDao.add(user1);

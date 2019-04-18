@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
 @ContextConfiguration(locations="/test/test-applicationContext.xml")
 public class UserDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoTest.class);
-
+    private static final String TEST_EMAIL = "";
     @Autowired
     private UserDao dao;
     private Map<String, User> memberMap = Maps.newHashMap();
@@ -43,9 +43,9 @@ public class UserDaoTest {
         dao.deleteAll();
         assertThat(dao.getCount(), is(0));
 
-        memberMap.put("test_user1", new User("test_user1","user1_name","1234", Level.BASIC, 1, 0));
-        memberMap.put("test_user2", new User("test_user2","user2_name","1234", Level.SILVER, 55, 10));
-        memberMap.put("test_user3", new User("test_user3","user3_name","1234", Level.GOLD, 100, 40));
+        memberMap.put("test_user1", new User("test_user1","user1_name","1234", TEST_EMAIL, Level.BASIC, 1, 0));
+        memberMap.put("test_user2", new User("test_user2","user2_name","1234", TEST_EMAIL, Level.SILVER, 55, 10));
+        memberMap.put("test_user3", new User("test_user3","user3_name","1234", TEST_EMAIL, Level.GOLD, 100, 40));
     }
 
     @Test(expected = DuplicateUserIdException.class)
@@ -56,8 +56,8 @@ public class UserDaoTest {
 
     @Test
     public void addAndGet() {
-        User user1 = new User("spring", "bookswag", "1234", Level.SILVER, 310, 160);
-        User user2 = new User("spring2", "book_swag", "1234", Level.GOLD, 200, 100);
+        User user1 = new User("spring", "bookswag", "1234", TEST_EMAIL, Level.SILVER, 310, 160);
+        User user2 = new User("spring2", "book_swag", "1234", TEST_EMAIL, Level.GOLD, 200, 100);
 
         dao.add(user1);
         dao.add(user2);
