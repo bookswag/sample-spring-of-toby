@@ -3,6 +3,7 @@ package com.bookswag.spring.learningtest;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,7 +33,11 @@ public class DynamicProxyTest {
         assertThat(hello.sayHi(NAME), is("Hi Bookswag"));
         assertThat(hello.sayThankYou(NAME), is("Thank you Bookswag"));
 
-        Hello proxiedHello = new HelloUpper(new HelloSimple());
+        Hello proxiedHello = (Hello) Proxy.newProxyInstance( // safety casting. 'cause target of UpperHandler is Hello interface
+          getClass().getClassLoader(), // used for dynamic proxy class loading
+          new Class[] { Hello.class }, // target interface
+          new UpperHandler(new HelloSimple()) // has decorate code to do upper as additional function
+        );
         assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
         assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
         assertThat(proxiedHello.sayThankYou(NAME), is("THANK YOU BOOKSWAG"));
