@@ -4,18 +4,14 @@ import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import lombok.Setter;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Properties;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.activation.*;
 
 @Setter
 @Service
@@ -65,25 +61,16 @@ public class UserService {
     }
 
     private void sendUpgradeEmail(User user) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "mail.bookswag.org");
-        Session s = Session.getInstance(props, null);
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("mail.server.com");
 
-        MimeMessage message = new MimeMessage(s);
-        try {
-            message.setFrom(new InternetAddress(ADMIN_MAIL));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-            message.setSubject("Notice to upgrade");
-            message.setText("Your level upgrades to "+user.getLevel().name());
-            Transport.send(message);
-        } catch (AddressException e) {
-            throw new RuntimeException(e);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-//        catch (UnsupportedEncodingException e) {
-//            throw new RuntimeException(e);
-//        }
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom(ADMIN_MAIL);
+        mailMessage.setSubject("Notice to upgrade");
+        mailMessage.setText("Your level upgraded to "+user.getLevel().name());
+
+        mailSender.send(mailMessage);
     }
 
     public void add(User user) {
