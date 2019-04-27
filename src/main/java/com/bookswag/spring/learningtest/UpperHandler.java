@@ -12,6 +12,6 @@ public class UpperHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object ret = method.invoke(target, args);
-        return ret instanceof String ? ((String)ret).toUpperCase() : ret;
+        return ret instanceof String && method.getName().startsWith("say") ? ((String)ret).toUpperCase() : ret;
     }
 }
