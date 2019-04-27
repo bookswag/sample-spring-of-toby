@@ -1,6 +1,5 @@
 package com.bookswag.spring.service;
 
-import com.bookswag.spring.common.UnsupportedMethodException;
 import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.database.UserServiceTx;
 import com.bookswag.spring.domain.Level;
@@ -35,7 +34,7 @@ public class UserServiceTest {
     private static final String TEST_EMAIL = "test_spring_of_toby@gmail.com";
 
     @Autowired
-    private UserServiceImpl userSerivce;
+    private UserServiceImpl userService;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -57,30 +56,37 @@ public class UserServiceTest {
 
     @Test
     public void bean() {
-        assertThat(this.userSerivce, is(notNullValue()));
+        assertThat(this.userService, is(notNullValue()));
     }
 
+    /**
+     * Isolation testing
+     */
     @Test
     public void upgradeUsersLevel() throws Exception{
+        UserServiceImpl userServiceImpl = new UserServiceImpl();
+        MockUserDao mockUserDao = new MockUserDao(this.users);
+        userServiceImpl.setUserDao(mockUserDao);
         MockMailSender mockMailSender = new MockMailSender();
-        userSerivce.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
-        for (User user : users) {
-            userDao.add(user);
-        }
 
-        userSerivce.upgradeLevels();
+        userServiceImpl.upgradeLevels();
 
-        checkLevelUpgraded(users.get(0), false);
-        checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(2), false);
-        checkLevelUpgraded(users.get(3), true);
-        checkLevelUpgraded(users.get(4), false);
-
+        List<User> updatedUsers = mockUserDao.getUpdatedUsers();
+        assertThat(updatedUsers.size(), is(2));
+        checkUserAndLevel(updatedUsers.get(0), "test_2", Level.SILVER);
+        checkUserAndLevel(updatedUsers.get(1), "test_4", Level.GOLD);
+        
         List<String> requests = mockMailSender.getRequests();
         assertThat(requests.size(), is(2));
         assertThat(requests.get(0), is(users.get(1).getEmail()));
         assertThat(requests.get(1), is(users.get(3).getEmail()));
+    }
+
+    private void checkUserAndLevel(User updatedUser, String expectedId, Level expectedLevel) {
+        assertThat(updatedUser.getId(), is(expectedId));
+        assertThat(updatedUser.getLevel(), is(expectedLevel));
     }
 
     @Test
@@ -123,14 +129,46 @@ public class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        userSerivce.add(userWithLevel);
-        userSerivce.add(userWithoutLevel);
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
 
         User userWithLevelOnDB = userDao.get(userWithLevel.getId());
         User userWithoutLevelOnDB = userDao.get(userWithoutLevel.getId());
 
         assertThat(userWithLevelOnDB.getLevel(), is(userWithLevel.getLevel()));
         assertThat(userWithoutLevelOnDB.getLevel(), is(userWithoutLevel.getLevel()));
+    }
+
+    static class MockUserDao implements UserDao {
+        private List<User> users;
+        private List<User> updatedUsers = Lists.newArrayList();
+
+        public MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+        public List<User> getUpdatedUsers() {
+            return this.updatedUsers;
+        }
+
+        @Override
+        public List<User> getAll() {
+            return this.users;
+        }
+
+        @Override
+        public void update(User user) {
+            updatedUsers.add(user);
+        }
+
+        @Override
+        public void add(User user) { throw new UnsupportedOperationException(); }
+        @Override
+        public void deleteAll() { throw new UnsupportedOperationException(); }
+        @Override
+        public User get(String id) { throw new UnsupportedOperationException(); }
+        @Override
+        public int getCount() { throw new UnsupportedOperationException(); }
     }
 
     static class MockMailSender implements MailSender {
@@ -147,7 +185,7 @@ public class UserServiceTest {
 
         @Override
         public void send(SimpleMailMessage[] messages) throws MailException {
-            throw new UnsupportedMethodException();
+            throw new UnsupportedOperationException();
         }
     }
 }
