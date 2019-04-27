@@ -7,11 +7,11 @@ import java.lang.reflect.Method;
 
 @AllArgsConstructor
 public class UpperHandler implements InvocationHandler {
-    private Hello target;
+    private Object target;
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        String ret = (String) method.invoke(target, args);
-        return ret.toUpperCase();
+        Object ret = method.invoke(target, args);
+        return ret instanceof String ? ((String)ret).toUpperCase() : ret;
     }
 }
