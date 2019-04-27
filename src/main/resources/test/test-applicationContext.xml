@@ -25,9 +25,13 @@
         <property name="host" value="mail.server.com"/>
     </bean>
 
-    <bean id="userService" class="com.bookswag.spring.service.UserService">
+    <bean id="userServiceImpl" class="com.bookswag.spring.service.UserServiceImpl">
         <property name="userDao" ref="userDao" />
-        <property name="transactionManager" ref="transactionManager" />
         <property name="mailSender" ref="mailSender" />
+    </bean>
+
+    <bean id="userService" class="com.bookswag.spring.database.UserServiceTx">
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="userService" ref="userServiceImpl" />
     </bean>
 </beans>

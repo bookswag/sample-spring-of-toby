@@ -2,6 +2,7 @@ package com.bookswag.spring.service;
 
 import com.bookswag.spring.common.UnsupportedMethodException;
 import com.bookswag.spring.dao.UserDao;
+import com.bookswag.spring.database.UserServiceTx;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
@@ -23,8 +24,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import static com.bookswag.spring.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static com.bookswag.spring.service.UserService.MIN_RECOMMEND_FOR_GOLD;
+import static com.bookswag.spring.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static com.bookswag.spring.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 import static org.springframework.test.util.AssertionErrors.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -34,7 +35,7 @@ public class UserServiceTest {
     private static final String TEST_EMAIL = "test_spring_of_toby@gmail.com";
 
     @Autowired
-    private UserService userSerivce;
+    private UserServiceImpl userSerivce;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -84,16 +85,23 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() throws Exception {
-        UserService testUserService = new TestUserService(users.get(3).getId());
+        MockMailSender mockMailSender = new MockMailSender();
+        UserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setTransactionManager(this.transactionManager);
+        testUserService.setMailSender(mockMailSender);
+
+        UserServiceTx txUserService = new UserServiceTx();
+        txUserService.setTransactionManager(transactionManager);
+        txUserService.setUserService(testUserService);
+
+
         userDao.deleteAll();
         for(User user : users) {
             userDao.add(user);
         }
 
         try {
-            testUserService.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("Expected TestUserServiceException");
         } catch (TestUserServiceException e) { }
 

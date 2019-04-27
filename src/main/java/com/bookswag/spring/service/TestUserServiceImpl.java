@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
-public class TestUserService extends UserService {
+public class TestUserServiceImpl extends UserServiceImpl {
     private String id;
 
     protected void upgradeLevel(User user) {
