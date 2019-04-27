@@ -1,6 +1,7 @@
 package com.bookswag.spring.service;
 
 import com.bookswag.spring.dao.UserDao;
+import com.bookswag.spring.database.TransactionHandler;
 import com.bookswag.spring.database.UserServiceTx;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -96,10 +98,16 @@ public class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(mockMailSender);
 
-        UserServiceTx txUserService = new UserServiceTx();
-        txUserService.setTransactionManager(transactionManager);
-        txUserService.setUserService(testUserService);
+        TransactionHandler txHandler = new TransactionHandler();
+        txHandler.setTarget(testUserService);
+        txHandler.setTransactionManager(transactionManager);
+        txHandler.setPattern("upgradeLevels");
 
+        UserService txUserService = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class[] { UserService.class },
+                txHandler
+        );
 
         userDao.deleteAll();
         for(User user : users) {
