@@ -4,6 +4,7 @@ import com.bookswag.spring.dao.UserDao;
 import com.bookswag.spring.dao.UserDaoJdbc;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
+import com.bookswag.spring.learningtest.factorybean.Message;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,5 +69,11 @@ public class CommonTest {
             // TODO : Search way to compile
             //assertThat(set.translate(null, null, sqlException), isA(DuplicateKeyException.class));
         }
+    }
+
+    @Test
+    public void getBeanMessage() {
+        Object message = context.getBean("message");
+        assertThat(((Message) message).getText(), is("Factory Bean"));
     }
 }

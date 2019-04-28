@@ -34,4 +34,9 @@
         <property name="transactionManager" ref="transactionManager" />
         <property name="userService" ref="userServiceImpl" />
     </bean>
+
+    <!-- LEARNING TEST -->
+    <bean id="message" class="com.bookswag.spring.learningtest.factorybean.MessageFactoryBean">
+        <property name="text" value="Factory Bean"/>
+    </bean>
 </beans>
