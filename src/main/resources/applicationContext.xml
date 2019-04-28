@@ -30,8 +30,10 @@
         <property name="mailSender" ref="mailSender" />
     </bean>
 
-    <bean id="userService" class="com.bookswag.spring.database.UserServiceTx">
+    <bean id="userService" class="com.bookswag.spring.database.TxProxyFactoryBean">
+        <property name="target" ref="userServiceImpl" />
         <property name="transactionManager" ref="transactionManager" />
-        <property name="userService" ref="userServiceImpl" />
+        <property name="pattern" value="upgradeLevels" />
+        <property name="serviceInterface" value="com.bookswag.spring.service.UserService" />
     </bean>
 </beans>
