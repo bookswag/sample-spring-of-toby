@@ -1,6 +1,9 @@
 package com.bookswag.spring.learningtest;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactoryBean;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -41,5 +44,25 @@ public class DynamicProxyTest {
         assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
         assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
         assertThat(proxiedHello.sayThankYou(NAME), is("THANK YOU BOOKSWAG"));
+    }
+
+    @Test
+    public void springProxyFactoryBean() {
+        ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTarget(new HelloSimple());
+        proxyFactoryBean.addAdvice(new UpperAdvice());
+
+        Hello proxiedHello = (Hello) proxyFactoryBean.getObject();
+        assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
+        assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
+        assertThat(proxiedHello.sayThankYou(NAME), is("THANK YOU BOOKSWAG"));
+    }
+
+    static class UpperAdvice implements MethodInterceptor {
+
+        public Object invoke(MethodInvocation invocation) throws Throwable {
+            String ret = (String) invocation.proceed();
+            return ret.toUpperCase();
+        }
     }
 }
