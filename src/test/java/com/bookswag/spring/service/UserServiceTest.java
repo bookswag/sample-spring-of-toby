@@ -1,15 +1,14 @@
 package com.bookswag.spring.service;
 
 import com.bookswag.spring.dao.UserDao;
-import com.bookswag.spring.database.TransactionHandler;
 import com.bookswag.spring.database.TxProxyFactoryBean;
-import com.bookswag.spring.database.UserServiceTx;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -20,7 +19,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.lang.reflect.Proxy;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -40,7 +38,7 @@ public class UserServiceTest {
     @Autowired
     private ApplicationContext context;
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -103,7 +101,7 @@ public class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(mockMailSender);
 
-        TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
         txProxyFactoryBean.setTarget(testUserService);
         UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
