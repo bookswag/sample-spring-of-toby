@@ -2,7 +2,10 @@ package com.bookswag.spring.learningtest;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -82,5 +85,50 @@ public class DynamicProxyTest {
         assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
         assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
         assertThat(proxiedHello.sayThankYou(NAME), is("Thank you Bookswag"));
+    }
+
+    @Test
+    public void classNamePointcutAdvisor() {
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return (clazz) -> clazz.getSimpleName().startsWith("HelloS");
+            }
+        };
+        
+        classMethodPointcut.setMappedName("sayH*");
+
+        checkAdviced(new HelloSimple(), classMethodPointcut, true);
+
+        class HelloWorld extends HelloSimple {}
+        checkAdviced(new HelloWorld(), classMethodPointcut, false);
+
+        class HelloBookswag extends HelloSimple {}
+        checkAdviced(new HelloBookswag(), classMethodPointcut, false);
+    }
+
+    private void checkAdviced(Object target, Pointcut pointcut, boolean adviced) {
+        ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTarget(target);
+        proxyFactoryBean.addAdvisor(
+                new DefaultPointcutAdvisor(
+                    pointcut, (MethodInterceptor) invocation -> {
+                        String ret = (String) invocation.proceed();
+                        return ret.toUpperCase();
+                }));
+
+        Hello proxiedHello = (Hello) proxyFactoryBean.getObject();
+
+        if (adviced) {
+            assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
+            assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
+            assertThat(proxiedHello.sayThankYou(NAME), is("Thank you Bookswag"));
+        } else {
+            assertThat(proxiedHello.sayHello(NAME), is("Hello Bookswag"));
+            assertThat(proxiedHello.sayHi(NAME), is("Hi Bookswag"));
+            assertThat(proxiedHello.sayThankYou(NAME), is("Thank you Bookswag"));
+        }
+
+
     }
 }
