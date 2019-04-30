@@ -50,19 +50,14 @@ public class DynamicProxyTest {
     public void springProxyFactoryBean() {
         ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
         proxyFactoryBean.setTarget(new HelloSimple());
-        proxyFactoryBean.addAdvice(new UpperAdvice());
+        proxyFactoryBean.addAdvice((MethodInterceptor) invocation -> {
+            String ret = (String) invocation.proceed();
+            return ret.toUpperCase();
+        });
 
         Hello proxiedHello = (Hello) proxyFactoryBean.getObject();
         assertThat(proxiedHello.sayHello(NAME), is("HELLO BOOKSWAG"));
         assertThat(proxiedHello.sayHi(NAME), is("HI BOOKSWAG"));
         assertThat(proxiedHello.sayThankYou(NAME), is("THANK YOU BOOKSWAG"));
-    }
-
-    static class UpperAdvice implements MethodInterceptor {
-
-        public Object invoke(MethodInvocation invocation) throws Throwable {
-            String ret = (String) invocation.proceed();
-            return ret.toUpperCase();
-        }
     }
 }
