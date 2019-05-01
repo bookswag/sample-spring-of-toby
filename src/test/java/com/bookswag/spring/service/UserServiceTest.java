@@ -5,6 +5,7 @@ import com.bookswag.spring.database.TxProxyFactoryBean;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,8 @@ public class UserServiceTest {
     private ApplicationContext context;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserService testUserService;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -94,24 +97,14 @@ public class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext
     public void upgradeAllOrNothing() throws Exception {
-        MockMailSender mockMailSender = new MockMailSender();
-        UserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
-        testUserService.setUserDao(this.userDao);
-        testUserService.setMailSender(mockMailSender);
-
-        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
         userDao.deleteAll();
         for(User user : users) {
             userDao.add(user);
         }
 
         try {
-            txUserService.upgradeLevels();
+            testUserService.upgradeLevels();
             fail("Expected TestUserServiceException");
         } catch (TestUserServiceException e) { }
 
@@ -192,4 +185,18 @@ public class UserServiceTest {
             throw new UnsupportedOperationException();
         }
     }
+
+    static class TestUserServiceImpl extends UserServiceImpl {
+        private String id = "test_4";
+
+        @Override
+        public void upgradeLevel(User user) {
+            if (StringUtils.equals(user.getId(), this.id)) {
+                throw new TestUserServiceException();
+            }
+            super.upgradeLevel(user);
+        }
+    }
+
+    static class TestUserServiceException extends RuntimeException { }
 }
