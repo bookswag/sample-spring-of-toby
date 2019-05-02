@@ -1,4 +1,4 @@
-package com.bookswag.spring.learningtest;
+package com.bookswag.spring.learningtest.dynamicproxy;
 
 public interface Hello {
     String sayHello(String name);

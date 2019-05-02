@@ -1,4 +1,4 @@
-package com.bookswag.spring.learningtest;
+package com.bookswag.spring.learningtest.dynamicproxy;
 
 public class HelloSimple implements Hello {
     @Override

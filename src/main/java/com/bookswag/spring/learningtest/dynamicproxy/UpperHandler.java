@@ -1,4 +1,4 @@
-package com.bookswag.spring.learningtest;
+package com.bookswag.spring.learningtest.dynamicproxy;
 
 import lombok.AllArgsConstructor;
 

@@ -1,8 +1,9 @@
 package com.bookswag.spring.learningtest;
 
+import com.bookswag.spring.learningtest.dynamicproxy.Hello;
+import com.bookswag.spring.learningtest.dynamicproxy.HelloSimple;
+import com.bookswag.spring.learningtest.dynamicproxy.UpperHandler;
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
