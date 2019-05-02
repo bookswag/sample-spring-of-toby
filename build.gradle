@@ -49,6 +49,7 @@ dependencies {
     // etc
     compile group: 'org.springframework', name: 'spring-context-support', version: '3.2.0.RELEASE'
     compile group: 'javax.mail', name: 'mail', version: '1.4.1'
+    compile group: 'org.springframework', name: 'spring-aspects', version: '3.2.8.RELEASE'
 
     //exclude the build in hamcrest
     testCompile('junit:junit:' + junitVersion) {
