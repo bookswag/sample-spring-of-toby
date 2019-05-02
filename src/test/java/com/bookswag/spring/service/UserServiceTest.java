@@ -20,10 +20,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 import static com.bookswag.spring.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
@@ -118,6 +118,12 @@ public class UserServiceTest {
         } else {
             assertThat(updatedUser.getLevel(), is(user.getLevel()));
         }
+    }
+
+    @Test
+    public void checkAdvisorAutoProxyCreator() {
+        assertThat(testUserService, is(not(UserService.class)));
+        assertThat((Proxy) testUserService, isA(java.lang.reflect.Proxy.class));
     }
 
     @Test
