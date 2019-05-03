@@ -16,6 +16,7 @@ import java.lang.reflect.Proxy;
  * 1. Can't adapt common additional function to a lot of target classes at once
  * 2. Be tough to adapt multi-additional function to a target
 * */
+@Deprecated
 @Setter
 public class TxProxyFactoryBean implements FactoryBean<Object> {
     private Object target;

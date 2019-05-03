@@ -1,7 +1,6 @@
 package com.bookswag.spring.service;
 
 import com.bookswag.spring.dao.UserDao;
-import com.bookswag.spring.database.TxProxyFactoryBean;
 import com.bookswag.spring.domain.Level;
 import com.bookswag.spring.domain.User;
 import com.google.common.collect.Lists;
@@ -9,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
