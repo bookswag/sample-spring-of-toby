@@ -140,6 +140,12 @@ public class UserServiceTest {
         assertThat(userWithoutLevelOnDB.getLevel(), is(userWithoutLevel.getLevel()));
     }
 
+    @Test
+    public void readOnlyTransactionAttribute() {
+        testUserService.getAll();
+        fail("Expected Readonly-Transaction Exception of TestUserService");
+    }
+
     static class MockUserDao implements UserDao {
         private List<User> users;
         private List<User> updatedUsers = Lists.newArrayList();
@@ -190,7 +196,7 @@ public class UserServiceTest {
         }
     }
 
-    static class TestUserServiceImpl extends UserServiceImpl {
+    static class TestUserService extends UserServiceImpl {
         private String id = "test_4";
 
         @Override
@@ -199,6 +205,15 @@ public class UserServiceTest {
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
+        }
+
+        @Override
+        public List<User> getAll() {
+            List<User> users = super.getAll();
+            for(User user : users) {
+                super.update(user);
+            }
+            return null;
         }
     }
 

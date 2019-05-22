@@ -9,6 +9,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.List;
+
 @Setter
 @Deprecated
 public class UserServiceTx implements UserService {
@@ -34,4 +36,13 @@ public class UserServiceTx implements UserService {
             throw e;
         }
     }
+
+    @Override
+    public User get(String id) { throw new UnsupportedOperationException();	}
+    @Override
+    public List<User> getAll() { throw new UnsupportedOperationException();	}
+    @Override
+    public void deleteAll() { throw new UnsupportedOperationException();	}
+    @Override
+    public void update(User user) { throw new UnsupportedOperationException();	}
 }

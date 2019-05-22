@@ -28,23 +28,16 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+    <tx:advice id="transactionAdvice">
         <tx:attributes>
-            <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
+            <tx:method name="get*" read-only="true" timeout="30"/>
             <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
-            <tx:method name="*" propagation="REQUIRED"/>
-        </tx:attributes>
-    </tx:advice>
-
-    <tx:advice id="batchTxAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <tx:method name="mock*" propagation="REQUIRED"/>
+            <tx:method name="*"/>
         </tx:attributes>
     </tx:advice>
 
     <aop:config>
-        <aop:advisor advice-ref="transactionAdvice" pointcut="execution(* *..*ServiceImpl.upgrade*(..))" />
-        <aop:advisor advice-ref="batchTxAdvice" pointcut="execution(* *..*BatchServiceJob.*(..))" />
+        <aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)" />
     </aop:config>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
